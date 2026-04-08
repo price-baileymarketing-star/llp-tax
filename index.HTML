@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLP Employer NICs Impact Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2e4a;--teal:#00a99d;--light:#f4f7f9;--border:#dde3ea;
+  --text:#2c3e50;--muted:#6b7c8f;--red:#c0392b;--green:#2e7d32;
+}
+body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);font-size:15px;line-height:1.5}
+
+.header{background:var(--navy);color:#fff;padding:28px 32px}
+.header h1{font-size:20px;font-weight:700;margin-bottom:5px}
+.header p{font-size:13px;opacity:.75;max-width:540px;line-height:1.6}
+
+.input-section{background:var(--light);border-bottom:1px solid var(--border);padding:24px 32px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pound-wrap{position:relative}
+.pound-wrap .sym{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--muted);font-size:16px;pointer-events:none}
+.pound-wrap input{padding:11px 12px 11px 28px;border:2px solid var(--border);border-radius:6px;font-size:17px;font-weight:600;font-family:inherit;width:200px;color:var(--navy);outline:none;transition:border-color .2s}
+.pound-wrap input:focus{border-color:var(--teal)}
+.plain-input{padding:11px 12px;border:2px solid var(--border);border-radius:6px;font-size:15px;font-weight:500;font-family:inherit;width:140px;color:var(--navy);outline:none;transition:border-color .2s}
+.plain-input:focus{border-color:var(--teal)}
+.calc-btn{background:var(--teal);color:#fff;border:none;padding:12px 26px;border-radius:6px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;white-space:nowrap;height:46px}
+.calc-btn:hover{background:#008f84}
+
+/* Config toggle */
+.cfg-toggle-wrap{padding:14px 32px 0}
+.cfg-toggle-wrap button{background:none;border:none;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline}
+.cfg-panel{display:none;margin:10px 32px 0;background:var(--light);border:1px solid var(--border);border-radius:8px;padding:18px 22px}
+.cfg-panel.open{display:block}
+.cfg-panel h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.cfg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 20px}
+.cfg-item{display:flex;flex-direction:column;gap:3px}
+.cfg-item label{font-size:11px;font-weight:600;color:var(--muted)}
+.cfg-item input{padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;color:var(--navy);outline:none}
+.cfg-item input:focus{border-color:var(--teal)}
+.cfg-actions{margin-top:12px;display:flex;gap:10px}
+.cfg-actions button{padding:7px 16px;border-radius:5px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.btn-apply{background:var(--teal);color:#fff}
+.btn-reset{background:#fff;color:var(--muted);border:1px solid var(--border)!important}
+
+/* Results */
+.results{display:none}
+.results.show{display:block}
+
+/* Summary cards */
+.cards{display:flex;border-top:3px solid var(--border);border-bottom:1px solid var(--border)}
+.card{flex:1;padding:20px 22px;border-right:1px solid var(--border)}
+.card:last-child{border-right:none}
+.card .clabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.card .big{font-size:24px;font-weight:700;margin-bottom:2px}
+.card .small{font-size:13px;color:var(--muted)}
+.card .small strong{color:var(--text)}
+.c1 .clabel,.c1 .big{color:var(--navy)}
+.c2 .clabel,.c2 .big{color:var(--red)}
+.c3 .clabel,.c3 .big{color:var(--teal)}
+.cd .clabel{color:var(--muted)}
+.neg{color:var(--red)!important}
+.pos{color:var(--green)!important}
+
+/* Breakdown */
+.detail{padding:24px 32px 32px}
+.detail h2{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px}
+.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bcard{background:var(--light);border-radius:8px;padding:16px 18px;border:1px solid var(--border)}
+.bcard.full{grid-column:1/-1}
+.bcard h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.brow{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #e8ecf0;gap:12px}
+.brow:last-child{border-bottom:none}
+.brow.btot{border-top:1px solid var(--border);border-bottom:none;margin-top:4px;padding-top:8px}
+.brow .bl{font-size:13px;color:var(--muted);flex-shrink:0}
+.brow.btot .bl{font-weight:700;color:var(--text);font-size:13px}
+.brow .bvals{display:flex;gap:18px;flex-shrink:0}
+.bval{font-size:13px;font-weight:500;color:var(--text);text-align:right;min-width:72px}
+.bval.muted{color:var(--muted);font-weight:400}
+.col-heads{display:flex;justify-content:flex-end;gap:18px;padding:0 18px 4px;margin-bottom:-4px}
+.col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;min-width:72px;text-align:right}
+.col-head.h1{color:var(--navy)}.col-head.h2{color:var(--red)}.col-head.h3{color:var(--teal)}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:12px;margin-left:6px}
+.badge.neg{background:#fdecea;color:var(--red)}
+.badge.pos{background:#e8f5e9;color:var(--green)}
+.rneg{color:var(--red)!important}
+.rpos{color:var(--green)!important}
+
+.disclaimer{background:var(--light);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;color:var(--muted);line-height:1.7}
+.disclaimer strong{color:var(--text)}
+
+@media(max-width:600px){
+  .header,.input-section,.detail,.disclaimer,.cfg-toggle-wrap,.cfg-panel{padding-left:18px;padding-right:18px}
+  .card{padding:14px 14px}
+  .card .big{font-size:18px}
+  .cfg-panel{margin-left:18px;margin-right:18px}
+}
+</style>
+</head>
+<body>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// TAX CONFIG — update these values after each Budget announcement
+// Rates as decimals: 0.20 = 20%. Monetary values in whole pounds.
+// ═══════════════════════════════════════════════════════════════
+var DEFAULTS = {
+  // Personal allowance & tapering
+  personalAllowance:    12570,   // Standard personal allowance
+  taperStart:          100000,   // Allowance tapers above this income
+  // Income tax bands (gross income thresholds, not taxable income)
+  basicBandTop:         50270,   // Basic rate band top (PA + £37,700)
+  addlBandTop:         125140,   // Additional rate kicks in above this
+  // Income tax rates
+  rBasic:               0.20,
+  rHigher:              0.40,
+  rAdditional:          0.45,
+  // Class 4 NI (self-employed / LLP partners)
+  c4Lower:              12570,
+  c4Upper:              50270,
+  c4Primary:            0.06,    // 6% between lower and upper
+  c4Upper2:             0.02,    // 2% above upper
+  // Employer NI (the proposed LLP change)
+  erThreshold:           5000,   // Secondary threshold — ER NIC free below this
+  erRate:                0.15,   // 15% employer NI rate
+  // Corporation tax
+  ctMain:                0.25,   // Main rate
+  ctSmall:               0.19,   // Small profits rate
+  ctSmallLimit:          50000,  // Threshold for small profits rate
+  // Dividends
+  divAllowance:           500,   // Annual dividend allowance
+  divBasic:              0.0875,
+  divHigher:             0.3375,
+  divAddl:               0.3935,
+};
+var C = JSON.parse(JSON.stringify(DEFAULTS)); // working copy
+
+// ─── HELPERS ───────────────────────────────────────────────────
+function pa(income) {
+  // Personal allowance: tapers by £1 for every £2 over £100k
+  // Fully gone at £125,140
+  if (income <= C.taperStart) return C.personalAllowance;
+  var reduction = Math.floor((income - C.taperStart) / 2);
+  return Math.max(0, C.personalAllowance - reduction);
+}
+
+function incomeTax(gross, taxable) {
+  // gross = total income (used only for taper calc, already applied via pa())
+  // taxable = gross minus effective personal allowance
+  if (taxable <= 0) return 0;
+  var basicBand   = C.basicBandTop - C.personalAllowance; // £37,700
+  var higherBand  = C.addlBandTop  - C.basicBandTop;      // £74,870
+  var t1 = Math.min(taxable, basicBand);
+  var t2 = Math.max(0, Math.min(taxable - basicBand, higherBand));
+  var t3 = Math.max(0, taxable - basicBand - higherBand);
+  return t1 * C.rBasic + t2 * C.rHigher + t3 * C.rAdditional;
+}
+
+function class4NI(profit) {
+  var primary = Math.max(0, Math.min(profit, C.c4Upper) - C.c4Lower);
+  var upper   = Math.max(0, profit - C.c4Upper);
+  return primary * C.c4Primary + upper * C.c4Upper2;
+}
+
+function fmt(n) {
+  return '£' + Math.round(Math.abs(n)).toLocaleString('en-GB');
+}
+function fmtd(n) {
+  if (Math.abs(n) < 1) return '—';
+  return (n > 0 ? '+' : '−') + '£' + Math.round(Math.abs(n)).toLocaleString('en-GB');
+}
+function pct(n) { return (n * 100).toFixed(1) + '%'; }
+
+// ─── SCENARIO 1: Current LLP (no employer NICs) ────────────────
+function scenario1(grossProfit, pension) {
+  var profit     = grossProfit - pension;
+  var allowance  = pa(profit);
+  var taxable    = Math.max(0, profit - allowance);
+  var itax       = incomeTax(profit, taxable);
+  var ni         = class4NI(profit);
+  var total      = itax + ni;
+  var takehome   = profit - total;
+  return { profit:profit, allowance:allowance, taxable:taxable, itax:itax, ni:ni, erNI:0, total:total, takehome:takehome };
+}
+
+// ─── SCENARIO 2: After proposed ER NIC change (off-the-top method) ─
+// The LLP deducts ER NIC from the profit share before distributing.
+// ER NIC = 15% × (profit − £5,000). This reduces taxable profit,
+// which in turn reduces income tax and Class 4 NI (a partial offset).
+function scenario2(grossProfit, pension) {
+  // ER NIC calculated on full gross profit (before pension, before NIC deduction)
+  var erNI   = Math.max(0, (grossProfit - C.erThreshold) * C.erRate);
+  // Partner's distributable profit after NIC deducted off the top
+  var profit = grossProfit - erNI - pension;
+  var allowance = pa(profit);
+  var taxable   = Math.max(0, profit - allowance);
+  var itax      = incomeTax(profit, taxable);
+  var ni        = class4NI(profit);
+  // Total burden = personal taxes on reduced profit + ER NIC
+  var total     = itax + ni + erNI;
+  var takehome  = profit - itax - ni;
+  return { profit:profit, allowance:allowance, taxable:taxable, itax:itax, ni:ni, erNI:erNI, total:total, takehome:takehome };
+}
+
+// ─── SCENARIO 3: Incorporated (Salary + Dividends) ─────────────
+// Pays optimal salary = personal allowance (no income tax, minimal employee NI)
+// Remaining post-CT profit taken as dividends
+function scenario3(grossProfit, pension) {
+  var salary  = C.personalAllowance; // £12,570 optimal salary
+  // ER NIC on salary above £5k threshold
+  var erNI    = Math.max(0, (salary - C.erThreshold) * C.erRate);
+  // Company profit after salary + ER NIC cost
+  var coProfit = grossProfit - pension - salary - erNI;
+  // Corporation tax
+  var ct = coProfit <= 0 ? 0 :
+           coProfit <= C.ctSmallLimit ? coProfit * C.ctSmall : coProfit * C.ctMain;
+  // Net dividends
+  var divs = Math.max(0, coProfit - ct);
+  // Personal tax: salary below PA so £0 income tax on salary
+  // Employee NI: salary at £12,570 = at primary threshold, so ~£0
+  var empNI = 0;
+  // Dividend tax — total income for band purposes
+  var totalIncome = salary + divs;
+  var eff_pa      = pa(totalIncome);
+  // Remaining allowance after salary uses it up
+  var paLeft      = Math.max(0, eff_pa - salary);
+  var taxableDivs = Math.max(0, divs - paLeft - C.divAllowance);
+  var basicBand   = C.basicBandTop - C.personalAllowance; // £37,700
+  // Salary fills basic band first (none taxable here since salary ≤ PA)
+  var d1 = Math.min(taxableDivs, basicBand);
+  var d2 = Math.max(0, Math.min(taxableDivs - d1, C.addlBandTop - C.basicBandTop));
+  var d3 = Math.max(0, taxableDivs - d1 - d2);
+  var divTax = d1 * C.divBasic + d2 * C.divHigher + d3 * C.divAddl;
+  var total    = erNI + ct + empNI + divTax;
+  var takehome = salary + divs - empNI - divTax;
+  return { salary:salary, erNI:erNI, ct:ct, divs:divs, divTax:divTax, empNI:empNI, total:total, takehome:takehome };
+}
+
+// ─── MAIN CALCULATE ────────────────────────────────────────────
+function calculate() {
+  var rawVal  = document.getElementById('profit').value.replace(/[£,\s]/g, '');
+  var pension = parseFloat(document.getElementById('pension').value.replace(/[£,\s]/g, '')) || 0;
+  var gross   = parseFloat(rawVal);
+
+  if (!gross || gross <= 0 || isNaN(gross)) {
+    document.getElementById('error').style.display = 'block';
+    return;
+  }
+  document.getElementById('error').style.display = 'none';
+
+  var s1 = scenario1(gross, pension);
+  var s2 = scenario2(gross, pension);
+  var s3 = scenario3(gross, pension);
+
+  var base = gross - pension;
+  var r1 = base > 0 ? s1.total / base : 0;
+  var r2 = base > 0 ? s2.total / base : 0;
+  var r3 = base > 0 ? s3.total / base : 0;
+
+  // Summary cards
+  set('c1-th',  fmt(s1.takehome));
+  set('c1-tax', fmt(s1.total));
+  set('c1-rate',pct(r1));
+  set('c2-th',  fmt(s2.takehome));
+  set('c2-tax', fmt(s2.total));
+  set('c2-rate',pct(r2));
+  set('c3-th',  fmt(s3.takehome));
+  set('c3-tax', fmt(s3.total));
+  set('c3-rate',pct(r3));
+
+  var addl = s2.total - s1.total;
+  var el = document.getElementById('addl-tax');
+  el.textContent = fmt(addl) + ' additional tax';
+  el.className = 'big ' + (addl > 0 ? 'neg' : 'pos');
+
+  // Detail table rows: [label, s1val, s2val, s3val, show_diff]
+  function brow(label, v1, v2, v3, delta, invertDelta, isTot) {
+    var badgeHtml = '';
+    if (delta !== null) {
+      var isGood = invertDelta ? delta > 0 : delta < 0;
+      if (Math.abs(delta) >= 1) {
+        var sign = delta > 0 ? '+' : '−';
+        var dispVal = Math.abs(delta) < 1 ? (Math.abs(delta)*100).toFixed(1)+'%' : '£'+Math.round(Math.abs(delta)).toLocaleString('en-GB');
+        badgeHtml = '<span class="badge '+(isGood?'pos':'neg')+'">'+sign+dispVal+'</span>';
+      }
+    }
+    var cls = isTot ? 'brow btot' : 'brow';
+    return '<div class="'+cls+'"><span class="bl">'+label+badgeHtml+'</span>'
+      +'<div class="bvals">'
+      +'<span class="bval">'+v1+'</span>'
+      +'<span class="bval">'+v2+'</span>'
+      +(v3 !== null ? '<span class="bval '+(v3==='—'?'muted':'')+'">'+v3+'</span>' : '')
+      +'</div></div>';
+  }
+
+  function bcard(title, rows, full, threeCol) {
+    var heads = threeCol
+      ? '<div class="col-heads"><span class="col-head h1">Current</span><span class="col-head h2">After NICs</span><span class="col-head h3">Incorporated</span></div>'
+      : '<div class="col-heads"><span class="col-head h1">Current</span><span class="col-head h2">After NICs</span></div>';
+    return heads + '<div class="bcard'+(full?' full':'')+'"><h3>'+title+'</h3>'+rows.join('')+'</div>';
+  }
+
+  var html = '';
+
+  // Profit & NIC card (3 cols)
+  html += bcard('Profit & NIC', [
+    brow('Gross profit share', fmt(gross),      fmt(gross),      fmt(gross),    null, false, false),
+    brow('Pension',            fmt(pension)||'£0', fmt(pension)||'£0', fmt(pension)||'£0', null, false, false),
+    brow('Employer NICs',      '£0',            fmt(s2.erNI),    fmt(s3.erNI),  s2.erNI, false, false),
+    brow('Distributable profit',fmt(s1.profit), fmt(s2.profit),  '—',           s2.profit-s1.profit, false, true),
+  ], false, true);
+
+  // Income Tax card (2 cols + inc)
+  html += bcard('Income tax', [
+    brow('Personal allowance', fmt(s1.allowance), fmt(s2.allowance), fmt(C.personalAllowance), null, false, false),
+    brow('Taxable income',     fmt(s1.taxable),   fmt(s2.taxable),   '—',        s2.taxable-s1.taxable, false, false),
+    brow('Income tax',         fmt(s1.itax),      fmt(s2.itax),      fmt(s3.salaryIncomeTax||0), s2.itax-s1.itax, false, true),
+  ], false, true);
+
+  // NI card
+  html += bcard('National Insurance', [
+    brow('Class 4 / Employee NI', fmt(s1.ni), fmt(s2.ni), fmt(s3.empNI), s2.ni-s1.ni, false, true),
+  ], false, true);
+
+  // Incorporated card (inc only)
+  html += '<div class="bcard"><h3>Incorporated only</h3>'
+    + '<div class="brow"><span class="bl">Corporation tax</span><span class="bval">'+fmt(s3.ct)+'</span></div>'
+    + '<div class="brow"><span class="bl">Net dividends</span><span class="bval">'+fmt(s3.divs)+'</span></div>'
+    + '<div class="brow btot"><span class="bl">Dividend tax</span><span class="bval">'+fmt(s3.divTax)+'</span></div>'
+    + '</div>';
+
+  // Summary full-width
+  html += bcard('Summary', [
+    brow('Total tax & NIC', fmt(s1.total),    fmt(s2.total),    fmt(s3.total),    s2.total-s1.total,    false, false),
+    brow('Take-home pay',   fmt(s1.takehome), fmt(s2.takehome), fmt(s3.takehome), s2.takehome-s1.takehome, true, false),
+    brow('Effective rate',  pct(r1),          pct(r2),          pct(r3),          null, false, true),
+  ], true, true);
+
+  document.getElementById('breakdown').innerHTML = html;
+  document.getElementById('results').className = 'results show';
+}
+
+function set(id, val) { document.getElementById(id).textContent = val; }
+
+// ─── CONFIG PANEL ──────────────────────────────────────────────
+function toggleCfg() {
+  document.getElementById('cfg-panel').classList.toggle('open');
+}
+var CFG_LABELS = {
+  personalAllowance:'Personal Allowance (£)', taperStart:'Taper Start (£)',
+  basicBandTop:'Basic Band Top (£)', addlBandTop:'Additional Rate Threshold (£)',
+  rBasic:'Basic Rate', rHigher:'Higher Rate', rAdditional:'Additional Rate',
+  c4Lower:'Class 4 Lower Limit (£)', c4Upper:'Class 4 Upper Limit (£)',
+  c4Primary:'Class 4 Primary Rate', c4Upper2:'Class 4 Upper Rate',
+  erThreshold:'ER NIC Threshold (£)', erRate:'ER NIC Rate',
+  ctMain:'Corp Tax Main Rate', ctSmall:'Corp Tax Small Rate', ctSmallLimit:'Small Profits Limit (£)',
+  divAllowance:'Dividend Allowance (£)', divBasic:'Dividend Basic Rate',
+  divHigher:'Dividend Higher Rate', divAddl:'Dividend Additional Rate',
+};
+function buildCfg() {
+  var g = document.getElementById('cfg-grid');
+  g.innerHTML = '';
+  Object.keys(CFG_LABELS).forEach(function(k) {
+    var d = document.createElement('div');
+    d.className = 'cfg-item';
+    d.innerHTML = '<label>'+CFG_LABELS[k]+'</label><input data-key="'+k+'" value="'+C[k]+'">';
+    g.appendChild(d);
+  });
+}
+function applyCfg() {
+  document.querySelectorAll('.cfg-item input[data-key]').forEach(function(inp) {
+    C[inp.dataset.key] = parseFloat(inp.value) || 0;
+  });
+  toggleCfg();
+  if (document.getElementById('results').classList.contains('show')) calculate();
+}
+function resetCfg() {
+  C = JSON.parse(JSON.stringify(DEFAULTS));
+  buildCfg();
+}
+window.addEventListener('DOMContentLoaded', buildCfg);
+</script>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>LLP Employer NICs Impact Calculator</h1>
+  <p>See how the proposed Employer NICs changes affect your take-home as an LLP partner, and compare with incorporation.</p>
+</div>
+
+<!-- INPUT -->
+<div class="input-section">
+  <div class="field">
+    <label>Partnership profit share (£)</label>
+    <div class="pound-wrap">
+      <span class="sym">£</span>
+      <input type="text" id="profit" placeholder="118,000" inputmode="numeric">
+    </div>
+  </div>
+  <div class="field">
+    <label>Pension contribution (£)</label>
+    <input type="text" class="plain-input" id="pension" placeholder="0" inputmode="numeric">
+  </div>
+  <button class="calc-btn" onclick="calculate()">Calculate →</button>
+</div>
+<div id="error" style="display:none;padding:8px 32px;color:var(--red);font-size:13px;font-weight:600;">Please enter a valid profit figure to continue.</div>
+
+<!-- CONFIG -->
+<div class="cfg-toggle-wrap">
+  <button onclick="toggleCfg()">⚙ Adjust tax rates &amp; thresholds</button>
+</div>
+<div class="cfg-panel" id="cfg-panel">
+  <h3>Tax rates &amp; thresholds — update here after each Budget</h3>
+  <div class="cfg-grid" id="cfg-grid"></div>
+  <div class="cfg-actions">
+    <button class="btn-apply" onclick="applyCfg()">Apply</button>
+    <button class="btn-reset" onclick="resetCfg()">Reset to defaults</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results">
+  <div class="cards">
+    <div class="card c1">
+      <div class="clabel">Current LLP</div>
+      <div class="big" id="c1-th">—</div>
+      <div class="small">take-home pay</div>
+      <div class="small" style="margin-top:6px">Total tax: <strong id="c1-tax">—</strong></div>
+      <div class="small">Effective rate: <strong id="c1-rate">—</strong></div>
+    </div>
+    <div class="card c2">
+      <div class="clabel">After NIC change</div>
+      <div class="big" id="c2-th">—</div>
+      <div class="small">take-home pay</div>
+      <div class="small" style="margin-top:6px">Total tax: <strong id="c2-tax">—</strong></div>
+      <div class="small">Effective rate: <strong id="c2-rate">—</strong></div>
+    </div>
+    <div class="card c3">
+      <div class="clabel">If Incorporated</div>
+      <div class="big" id="c3-th">—</div>
+      <div class="small">take-home pay</div>
+      <div class="small" style="margin-top:6px">Total tax: <strong id="c3-tax">—</strong></div>
+      <div class="small">Effective rate: <strong id="c3-rate">—</strong></div>
+    </div>
+    <div class="card cd">
+      <div class="clabel">NIC change impact</div>
+      <div class="big neg" id="addl-tax">—</div>
+      <div class="small">vs current LLP</div>
+    </div>
+  </div>
+
+  <div class="detail">
+    <h2>Full breakdown</h2>
+    <div class="breakdown-grid" id="breakdown"></div>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <strong>Important:</strong> For illustrative purposes only. The Government has not yet finalised how Employer NICs will apply to LLP partners. This calculator uses the "off the top" methodology. Not tax advice — always consult a qualified adviser. Price Bailey LLP accepts no liability for decisions made based on this tool.
+</div>
+</body>
+</html>
