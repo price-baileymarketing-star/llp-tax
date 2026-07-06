@@ -1,438 +1,526 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en-GB">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LLP Employer NICs Impact Calculator | Price Bailey</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technology business lifecycle | Price Bailey</title>
+<meta name="robots" content="noindex">
+<!--
+  Standalone, iframe-ready. Cinematic intro: particle burst, wheel spins in and
+  settles, arc draws itself, shockwave, labels stagger in. Ambient background
+  orbs + twinkle dots after settle. Respects prefers-reduced-motion (skips
+  straight to the settled state). Broadcasts height via postMessage.
+-->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1a2e4a;--teal:#00a99d;--light:#f4f7f9;--border:#dde3ea;
-  --text:#2c3e50;--muted:#6b7c8f;--red:#c0392b;--green:#2e7d32;
-}
-body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);font-size:15px;line-height:1.5}
+  html, body { margin: 0; padding: 0; background: transparent; }
+  body { padding: 16px; }
 
-.header{background:var(--navy);color:#fff;padding:28px 32px}
-.header h1{font-size:20px;font-weight:700;margin-bottom:5px}
-.header p{font-size:13px;opacity:.75;max-width:540px;line-height:1.6}
+  .pb-journey {
+    --pb-navy: #0e2240;
+    --pb-teal: #00e0d0;
+    --pb-teal-mid: #00c2b6;
+    --pb-ink: #2a3340;
+    --pb-muted: #5b6675;
+    --pb-line: #e3e8ef;
+    --pb-bg: #f5f7fa;
+    --pb-card: #ffffff;
+    --pb-light: rgba(255,255,255,.88);
+    --pb-dim: rgba(255,255,255,.62);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--pb-light);
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    container-type: inline-size;
+    container-name: pbj;
+    background: linear-gradient(160deg, #1b4778 0%, #0b1b36 72%);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 22px;
+    padding: clamp(24px, 5cqi, 42px) clamp(18px, 4cqi, 36px);
+    box-shadow: 0 30px 70px -30px rgba(5,14,32,.85);
+    overflow: hidden;
+    position: relative;
+  }
+  .pb-journey *, .pb-journey *::before, .pb-journey *::after { box-sizing: border-box; }
+  .pb-journey ul { list-style: none; margin: 0; padding: 0; }
+  .pb-journey li { list-style: none; margin: 0; }
+  .pb-journey a { text-decoration: none; }
 
-.input-section{background:var(--light);border-bottom:1px solid var(--border);padding:24px 32px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.pound-wrap{position:relative}
-.pound-wrap .sym{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--muted);font-size:16px;pointer-events:none}
-.pound-wrap input{padding:11px 12px 11px 28px;border:2px solid var(--border);border-radius:6px;font-size:17px;font-weight:600;font-family:inherit;width:200px;color:var(--navy);outline:none;transition:border-color .2s}
-.pound-wrap input:focus{border-color:var(--teal)}
-.plain-input{padding:11px 12px;border:2px solid var(--border);border-radius:6px;font-size:15px;font-weight:500;font-family:inherit;width:140px;color:var(--navy);outline:none;transition:border-color .2s}
-.plain-input:focus{border-color:var(--teal)}
-.calc-btn{background:var(--teal);color:#fff;border:none;padding:12px 26px;border-radius:6px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s;white-space:nowrap;height:46px}
-.calc-btn:hover{background:#008f84}
+  /* ---------- Ambient background: aurora orbs + twinkle dots ---------- */
+  .pb-orbs { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .pb-orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .55; }
+  .pb-orb--1 { width: 46cqi; height: 46cqi; background: rgba(0,224,208,.38);
+    top: -14cqi; right: -8cqi; animation: pbDrift1 16s ease-in-out infinite alternate; }
+  .pb-orb--2 { width: 42cqi; height: 42cqi; background: rgba(52,120,235,.34);
+    bottom: -12cqi; left: -10cqi; animation: pbDrift2 20s ease-in-out infinite alternate; }
+  .pb-orb--3 { width: 30cqi; height: 30cqi; background: rgba(150,90,255,.18);
+    top: 40%; left: 34%; animation: pbDrift3 24s ease-in-out infinite alternate; }
+  .pb-dot { position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: #bffcf6; opacity: 0; animation: pbTwinkle 4s ease-in-out infinite; }
+  @keyframes pbDrift1 { to { transform: translate(-9cqi, 7cqi) scale(1.15); } }
+  @keyframes pbDrift2 { to { transform: translate(8cqi, -6cqi) scale(1.12); } }
+  @keyframes pbDrift3 { to { transform: translate(6cqi, 8cqi) scale(1.25); } }
+  @keyframes pbTwinkle { 0%,100% { opacity: 0; } 50% { opacity: .8; } }
 
-.cfg-toggle-wrap{padding:14px 32px 0}
-.cfg-toggle-wrap button{background:none;border:none;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline}
-.cfg-panel{display:none;margin:10px 32px 0;background:var(--light);border:1px solid var(--border);border-radius:8px;padding:18px 22px}
-.cfg-panel.open{display:block}
-.cfg-panel h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px}
-.cfg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 20px}
-.cfg-item{display:flex;flex-direction:column;gap:3px}
-.cfg-item label{font-size:11px;font-weight:600;color:var(--muted)}
-.cfg-item input{padding:6px 9px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:13px;color:var(--navy);outline:none}
-.cfg-item input:focus{border-color:var(--teal)}
-.cfg-actions{margin-top:12px;display:flex;gap:10px}
-.cfg-actions button{padding:7px 16px;border-radius:5px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none}
-.btn-apply{background:var(--teal);color:#fff}
-.btn-reset{background:#fff;color:var(--muted);border:1px solid var(--border)!important}
+  .pb-journey > *:not(.pb-orbs) { position: relative; z-index: 1; }
 
-.results{display:none}
-.results.show{display:block}
+  .pb-journey__head { text-align: center; margin-bottom: 8px; animation: pbHeadIn .7s ease both; }
+  @keyframes pbHeadIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+  .pb-journey__eyebrow {
+    text-transform: uppercase; letter-spacing: .16em; font-size: 12px;
+    font-weight: 700; color: var(--pb-teal); margin: 0 0 6px;
+    text-shadow: 0 0 18px rgba(0,224,208,.5);
+  }
+  .pb-journey__title {
+    font-size: clamp(22px, 4.4cqi, 31px); line-height: 1.16; color: #fff;
+    margin: 0 0 8px; font-weight: 700;
+  }
+  .pb-journey__lede { max-width: 560px; margin: 0 auto 18px; color: var(--pb-dim); font-size: 15.5px; line-height: 1.5; }
 
-.cards{display:flex;border-top:3px solid var(--border);border-bottom:1px solid var(--border)}
-.card{flex:1;padding:20px 22px;border-right:1px solid var(--border)}
-.card:last-child{border-right:none}
-.card .clabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
-.card .big{font-size:24px;font-weight:700;margin-bottom:2px}
-.card .small{font-size:13px;color:var(--muted)}
-.card .small strong{color:var(--text)}
-.c1 .clabel,.c1 .big{color:var(--navy)}
-.c2 .clabel,.c2 .big{color:var(--red)}
-.c3 .clabel,.c3 .big{color:var(--teal)}
-.cd .clabel{color:var(--muted)}
-.neg{color:var(--red)!important}
-.pos{color:var(--green)!important}
+  .pb-toggle {
+    display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 999px;
+    padding: 3px; background: rgba(255,255,255,.07); margin: 0 auto 18px; gap: 2px;
+    backdrop-filter: blur(4px);
+  }
+  .pb-toggle__btn {
+    border: 0; background: transparent; cursor: pointer; font: inherit;
+    font-size: 14px; font-weight: 600; color: var(--pb-dim);
+    padding: 8px 18px; border-radius: 999px; transition: .18s;
+  }
+  .pb-toggle__btn[aria-pressed="true"] { background: var(--pb-teal-mid); color: var(--pb-navy); }
+  .pb-toggle__wrap { text-align: center; }
 
-.detail{padding:24px 32px 32px}
-.detail h2{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:16px}
-.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.bcard{background:var(--light);border-radius:8px;padding:16px 18px;border:1px solid var(--border)}
-.bcard.full{grid-column:1/-1}
-.bcard h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.brow{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #e8ecf0;gap:12px}
-.brow:last-child{border-bottom:none}
-.brow.btot{border-top:1px solid var(--border);border-bottom:none;margin-top:4px;padding-top:8px}
-.brow .bl{font-size:13px;color:var(--muted);flex-shrink:0}
-.brow.btot .bl{font-weight:700;color:var(--text);font-size:13px}
-.brow .bvals{display:flex;gap:18px;flex-shrink:0}
-.bval{font-size:13px;font-weight:500;color:var(--text);text-align:right;min-width:72px}
-.bval.muted{color:var(--muted);font-weight:400}
-.col-heads{display:flex;justify-content:flex-end;gap:18px;padding:0 18px 4px;margin-bottom:-4px}
-.col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;min-width:72px;text-align:right}
-.col-head.h1{color:var(--navy)}.col-head.h2{color:var(--red)}.col-head.h3{color:var(--teal)}
-.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 7px;border-radius:12px;margin-left:6px}
-.badge.neg{background:#fdecea;color:var(--red)}
-.badge.pos{background:#e8f5e9;color:var(--green)}
+  /* ---------- Rail (linear) ---------- */
+  .pb-rail { position: relative; margin: 28px 0 8px; padding: 0 4px; }
+  .pb-rail__track { position: absolute; top: 23px; left: 32px; right: 32px; height: 3px; background: rgba(255,255,255,.16); border-radius: 3px; }
+  .pb-rail__fill { position: absolute; top: 23px; left: 32px; height: 3px; width: 0;
+    background: var(--pb-teal-mid); border-radius: 3px; transition: width .4s ease; box-shadow: 0 0 10px rgba(0,194,182,.7); }
+  .pb-rail__nodes { display: grid; grid-template-columns: repeat(6, 1fr); position: relative; gap: 4px; }
+  .pb-node { background: none; border: 0; cursor: pointer; font: inherit;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0; text-align: center; }
+  .pb-node__dot { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.05);
+    border: 3px solid rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: var(--pb-light); transition: .2s; position: relative; z-index: 2; flex: 0 0 auto; }
+  .pb-node:hover .pb-node__dot { border-color: var(--pb-teal-mid); color: #fff; }
+  .pb-node[aria-selected="true"] .pb-node__dot { background: var(--pb-teal-mid); border-color: var(--pb-teal-mid);
+    color: var(--pb-navy); transform: scale(1.08); animation: pbPulseDot 2.2s ease-in-out infinite; }
+  .pb-node__label { font-size: 11.5px; font-weight: 600; color: var(--pb-light); max-width: 96px; line-height: 1.2; }
+  .pb-node[aria-selected="true"] .pb-node__label { color: #fff; }
 
-.disclaimer{background:var(--light);border-top:1px solid var(--border);padding:16px 32px;font-size:12px;color:var(--muted);line-height:1.7}
-.disclaimer strong{color:var(--text)}
+  /* ---------- Loop (circular) ---------- */
+  .pb-loop { display: none; justify-content: center; margin: 0 0 2px; }
+  .pb-loop svg { width: 100%; max-width: 520px; height: auto; overflow: visible; }
+  .pb-loop__orbit { transform-box: view-box; }
+  .pb-loop__orbit.is-ambient { animation: pbSpin 36s linear infinite; }
+  .pb-loop__spark { fill: var(--pb-teal); filter: drop-shadow(0 0 6px rgba(0,224,208,1)); }
+  .pb-loop__node { cursor: pointer; }
+  .pb-loop__circle { fill: rgba(255,255,255,.06); stroke: rgba(255,255,255,.32); stroke-width: 3; transition: .2s; }
+  .pb-loop__node:hover .pb-loop__circle { stroke: var(--pb-teal); fill: rgba(0,224,208,.1); }
+  .pb-loop__node[aria-selected="true"] .pb-loop__circle { fill: var(--pb-teal-mid); stroke: var(--pb-teal-mid);
+    animation: pbPulseRing 2.2s ease-in-out infinite; }
+  .pb-loop__num { fill: var(--pb-light); font-weight: 700; font-size: 16px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  .pb-loop__node[aria-selected="true"] .pb-loop__num { fill: var(--pb-navy); }
+  .pb-loop__lbl { fill: var(--pb-light); font-size: 12px; font-weight: 600; text-anchor: middle; pointer-events: none; }
+  .pb-loop__centre { fill: #fff; font-size: 14px; font-weight: 700; text-anchor: middle; }
+  .pb-loop__centre--sub { fill: var(--pb-dim); font-size: 11px; font-weight: 500; }
 
-@media(max-width:700px){
-  .cards{flex-direction:column}
-  .card{border-right:none;border-bottom:1px solid var(--border)}
-  .breakdown-grid{grid-template-columns:1fr}
-  .bcard.full{grid-column:auto}
-}
-@media(max-width:600px){
-  .header,.input-section,.detail,.disclaimer,.cfg-toggle-wrap,.cfg-panel{padding-left:18px;padding-right:18px}
-  .cfg-panel{margin-left:18px;margin-right:18px}
-  .pound-wrap input{width:160px}
-}
+  .pb-journey[data-view="loop"] .pb-rail { display: none; }
+  .pb-journey[data-view="loop"] .pb-loop { display: flex; }
+
+  /* ---------- Stage detail ---------- */
+  .pb-stages { margin-top: 20px; }
+  .pb-stage { background: var(--pb-card); border: 1px solid rgba(255,255,255,.12); border-radius: 14px;
+    padding: 22px 20px 8px; margin-bottom: 14px; box-shadow: 0 12px 34px -18px rgba(0,0,0,.55); }
+  .pb-stage { display: none; }
+  .pb-stage.is-active { display: block; animation: pbStageIn .42s ease both; }
+  .pb-stage__head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pb-stage__num { font-size: 13px; font-weight: 700; color: #fff; background: var(--pb-teal-mid);
+    border-radius: 999px; padding: 3px 10px; letter-spacing: .04em; }
+  .pb-stage__title { font-size: 19px; color: var(--pb-navy); margin: 0; font-weight: 700; }
+  .pb-stage__desc { color: var(--pb-muted); font-size: 15px; line-height: 1.55; margin: 10px 0 16px; }
+  .pb-stage__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; padding: 0 0 16px; margin: 0; }
+  .pb-stage__grid a { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    color: var(--pb-navy); font-weight: 600; font-size: 14.5px; border: 1px solid var(--pb-line);
+    border-radius: 10px; padding: 12px 14px; background: var(--pb-bg); transition: .16s; }
+  .pb-stage__grid a:hover { border-color: var(--pb-teal-mid); background: #fff; transform: translateY(-1px);
+    box-shadow: 0 6px 16px -8px rgba(0,194,182,.5); }
+  .pb-stage__grid a::after { content: "\2192"; color: var(--pb-teal-mid); font-weight: 700; }
+  .pb-stage__loop { font-size: 13.5px; color: #00857c; font-weight: 600; border-top: 1px dashed var(--pb-line); padding: 12px 0 16px; margin: 0; }
+
+  @keyframes pbSpin { to { transform: rotate(360deg); } }
+  @keyframes pbStageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes pbPulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(0,224,208,.55); } 50% { box-shadow: 0 0 0 10px rgba(0,224,208,0); } }
+  @keyframes pbPulseRing { 0%,100% { filter: drop-shadow(0 0 0 rgba(0,224,208,0)); } 50% { filter: drop-shadow(0 0 9px rgba(0,224,208,.9)); } }
+
+  @container pbj (max-width: 560px) {
+    .pb-rail { padding: 0; }
+    .pb-rail__nodes { grid-template-columns: 1fr; gap: 10px; }
+    .pb-rail__track, .pb-rail__fill { display: none; }
+    .pb-node { flex-direction: row; gap: 12px; justify-content: flex-start; text-align: left; }
+    .pb-node__label { max-width: none; font-size: 13px; }
+    .pb-stage__grid { grid-template-columns: 1fr; }
+  }
+  @supports not (container-type: inline-size) {
+    @media (max-width: 600px) {
+      .pb-rail__nodes { grid-template-columns: 1fr; gap: 10px; }
+      .pb-rail__track, .pb-rail__fill { display: none; }
+      .pb-node { flex-direction: row; gap: 12px; justify-content: flex-start; text-align: left; }
+      .pb-node__label { max-width: none; }
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pb-journey *, .pb-journey *::before { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
+<section class="pb-journey" data-view="loop" aria-label="Technology business lifecycle">
+  <div class="pb-orbs" aria-hidden="true">
+    <div class="pb-orb pb-orb--1"></div>
+    <div class="pb-orb pb-orb--2"></div>
+    <div class="pb-orb pb-orb--3"></div>
+  </div>
+
+  <div class="pb-journey__head">
+    <p class="pb-journey__eyebrow">Wherever you are in the journey</p>
+    <h2 class="pb-journey__title">Supporting technology founders at every stage, and into the next venture</h2>
+    <p class="pb-journey__lede">Founders rarely stop at one business. Tap the stage that matches where your company is now and see how we can help. When you exit, the journey begins again.</p>
+  </div>
+
+  <div class="pb-toggle__wrap">
+    <div class="pb-toggle" role="group" aria-label="Choose layout">
+      <button type="button" class="pb-toggle__btn" data-view-btn="loop" aria-pressed="true">Lifecycle loop</button>
+      <button type="button" class="pb-toggle__btn" data-view-btn="linear" aria-pressed="false">Linear journey</button>
+    </div>
+  </div>
+
+  <div class="pb-loop" data-loop></div>
+
+  <div class="pb-rail" role="tablist" aria-label="Lifecycle stages">
+    <div class="pb-rail__track"></div>
+    <div class="pb-rail__fill" data-rail-fill></div>
+    <div class="pb-rail__nodes" data-rail-nodes></div>
+  </div>
+
+  <div class="pb-stages" data-stages>
+    <article class="pb-stage is-active" id="pb-stage-1" data-label="Start &amp; build">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 1</span><h3 class="pb-stage__title">Start &amp; build</h3></div>
+      <p class="pb-stage__desc">Incorporate, fund early research and development, and put the financial foundations in place so you can make commercial decisions from day one.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/tax/rd-tax-relief/" target="_blank" rel="noopener">R&amp;D tax relief</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/cloud-accounting/" target="_blank" rel="noopener">Cloud accounting</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/share-schemes-employees/" target="_blank" rel="noopener">Share schemes for employees</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/business-forecasting/" target="_blank" rel="noopener">Business forecasting and modelling</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/group-structuring/" target="_blank" rel="noopener">Group structuring</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-2" data-label="Fund &amp; raise">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 2</span><h3 class="pb-stage__title">Fund &amp; raise</h3></div>
+      <p class="pb-stage__desc">Raise venture capital, private equity or debt to accelerate, with the financial information and diligence readiness investors expect.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/series-ab-funding/" target="_blank" rel="noopener">Series A &amp; B funding</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/private-equity-funding/" target="_blank" rel="noopener">Private equity funding</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/debt-advisory-services/" target="_blank" rel="noopener">Debt advisory services</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/financial-due-diligence/" target="_blank" rel="noopener">Financial due diligence</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-3" data-label="Scale &amp; grow">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 3</span><h3 class="pb-stage__title">Scale &amp; grow</h3></div>
+      <p class="pb-stage__desc">Expand internationally and build the finance function to handle the complexity of multiple revenue models, territories and teams.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/outsourced-finance-team/" target="_blank" rel="noopener">Outsourced finance team</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/international-market-development/" target="_blank" rel="noopener">International market development</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/transfer-pricing/" target="_blank" rel="noopener">Transfer pricing</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/management-accounts/" target="_blank" rel="noopener">Management accounts</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-4" data-label="Optimise &amp; govern">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 4</span><h3 class="pb-stage__title">Optimise &amp; govern</h3></div>
+      <p class="pb-stage__desc">Strengthen systems, controls and governance so the board has accurate, commercial and meaningful data to guide pricing, margin and the next move.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/systems-consultancy-processes-review/" target="_blank" rel="noopener">Systems consultancy and processes</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/audit-assurance/" target="_blank" rel="noopener">Audit &amp; assurance</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/governance/" target="_blank" rel="noopener">Tax governance</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/strategic-planning/" target="_blank" rel="noopener">Strategic planning</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/valuations/growth-shares/" target="_blank" rel="noopener">Growth shares valuations</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-5" data-label="Exit &amp; realise value">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 5</span><h3 class="pb-stage__title">Exit &amp; realise value</h3></div>
+      <p class="pb-stage__desc">Prepare for and execute a sale, management buyout or employee ownership trust, and demonstrate to buyers a long history of strong financial information.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/selling-your-business/" target="_blank" rel="noopener">Selling your business</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/mergers-acquisitions/" target="_blank" rel="noopener">Mergers and acquisitions</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/vendor-due-diligence/" target="_blank" rel="noopener">Vendor due diligence</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/employee-ownership-trusts/" target="_blank" rel="noopener">Employee ownership trusts</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/valuations/" target="_blank" rel="noopener">Valuations</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-6" data-label="Beyond exit &amp; next venture">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 6</span><h3 class="pb-stage__title">Beyond exit &amp; next venture</h3></div>
+      <p class="pb-stage__desc">Plan and protect personal wealth after a successful exit, then put it to work backing the next idea.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/for-individuals/" target="_blank" rel="noopener">Tax, wills, probate and power of attorney</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/for-individuals/inheritance-tax-planning/" target="_blank" rel="noopener">Inheritance tax planning</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/family-investment-company/" target="_blank" rel="noopener">Family investment company</a></li>
+      </ul>
+      <p class="pb-stage__loop">The cycle repeats: many founders move straight into a new venture, and we are with them from stage one again.</p>
+    </article>
+  </div>
+</section>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// TAX CONFIG — update these values after each Budget announcement
-// Rates as decimals: 0.20 = 20%. Monetary values in whole pounds.
-// ═══════════════════════════════════════════════════════════════
-var DEFAULTS = {
-  // Personal allowance & tapering
-  personalAllowance:    12570,   // Standard personal allowance
-  taperStart:          100000,   // Allowance tapers above this income
-  // Income tax bands (gross income thresholds)
-  basicBandTop:         50270,   // Basic rate band top (PA + £37,700)
-  addlBandTop:         125140,   // Additional rate kicks in above this
-  // Income tax rates
-  rBasic:               0.20,
-  rHigher:              0.40,
-  rAdditional:          0.45,
-  // Class 4 NI (self-employed / LLP partners)
-  c4Lower:              12570,
-  c4Upper:              50270,
-  c4Primary:            0.06,    // 6% between lower and upper
-  c4Upper2:             0.02,    // 2% above upper
-  // Employer NI (the proposed LLP change)
-  erThreshold:           5000,   // Secondary threshold — ER NIC free below this
-  erRate:                0.15,   // 15% employer NI rate
-  // Corporation tax
-  ctMain:                0.25,   // Main rate
-  ctSmall:               0.19,   // Small profits rate
-  ctSmallLimit:          50000,  // Threshold for small profits rate
-  // Dividends
-  divAllowance:           500,   // Annual dividend allowance
-  divBasic:              0.0875,
-  divHigher:             0.3375,
-  divAddl:               0.3935,
-};
-var C = JSON.parse(JSON.stringify(DEFAULTS));
+(function () {
+  var root = document.querySelector('.pb-journey');
+  if (!root) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// ─── HELPERS ────────────────────────────────────────────────────────────────
+  var stages = Array.prototype.slice.call(root.querySelectorAll('.pb-stage'));
+  var nodesWrap = root.querySelector('[data-rail-nodes]');
+  var fill = root.querySelector('[data-rail-fill]');
+  var loopWrap = root.querySelector('[data-loop]');
+  var toggleBtns = root.querySelectorAll('[data-view-btn]');
+  var orbs = root.querySelector('.pb-orbs');
 
-// Personal allowance tapers by £1 for every £2 over £100k (gone at £125,140)
-function pa(income) {
-  if (income <= C.taperStart) return C.personalAllowance;
-  var reduction = Math.floor((income - C.taperStart) / 2);
-  return Math.max(0, C.personalAllowance - reduction);
-}
-
-// Income tax on taxable income (gross income used for taper, already applied via pa())
-function incomeTax(gross, taxable) {
-  if (taxable <= 0) return 0;
-  var basicBand  = C.basicBandTop - C.personalAllowance; // £37,700
-  var higherBand = C.addlBandTop  - C.basicBandTop;      // £74,870
-  var t1 = Math.min(taxable, basicBand);
-  var t2 = Math.max(0, Math.min(taxable - basicBand, higherBand));
-  var t3 = Math.max(0, taxable - basicBand - higherBand);
-  return t1 * C.rBasic + t2 * C.rHigher + t3 * C.rAdditional;
-}
-
-// Class 4 NI for LLP partners (self-employed basis)
-function class4NI(profit) {
-  var primary = Math.max(0, Math.min(profit, C.c4Upper) - C.c4Lower);
-  var upper   = Math.max(0, profit - C.c4Upper);
-  return primary * C.c4Primary + upper * C.c4Upper2;
-}
-
-function fmt(n)  { return '£' + Math.round(Math.abs(n)).toLocaleString('en-GB'); }
-function pct(n)  { return (n * 100).toFixed(1) + '%'; }
-
-// ─── SCENARIO 1: Current LLP (no employer NICs) ─────────────────────────────
-function scenario1(gross, pension) {
-  var profit    = gross - pension;
-  var allowance = pa(profit);
-  var taxable   = Math.max(0, profit - allowance);
-  var itax      = incomeTax(profit, taxable);
-  var ni        = class4NI(profit);
-  var total     = itax + ni;
-  return { profit:profit, allowance:allowance, taxable:taxable, itax:itax, ni:ni, erNI:0, total:total, takehome:profit-total };
-}
-
-// ─── SCENARIO 2: After proposed ER NIC change (off-the-top method) ──────────
-// ER NIC (15% × profit above £5k) is deducted from profit before distribution.
-// This reduces the partner's taxable profit, giving a partial income tax offset.
-function scenario2(gross, pension) {
-  var erNI      = Math.max(0, (gross - C.erThreshold) * C.erRate);
-  var profit    = gross - erNI - pension;
-  var allowance = pa(profit);
-  var taxable   = Math.max(0, profit - allowance);
-  var itax      = incomeTax(profit, taxable);
-  var ni        = class4NI(profit);
-  var total     = itax + ni + erNI;
-  return { profit:profit, allowance:allowance, taxable:taxable, itax:itax, ni:ni, erNI:erNI, total:total, takehome:profit-itax-ni };
-}
-
-// ─── SCENARIO 3: Incorporated (salary + dividends) ──────────────────────────
-// Optimal salary = personal allowance (no income tax, minimal employee NI).
-// Remaining post-CT profit extracted as dividends.
-function scenario3(gross, pension) {
-  var salary   = C.personalAllowance;
-  var erNI     = Math.max(0, (salary - C.erThreshold) * C.erRate);
-  var coProfit = Math.max(0, gross - pension - salary - erNI);
-  var ct       = coProfit <= C.ctSmallLimit ? coProfit * C.ctSmall : coProfit * C.ctMain;
-  var divs     = Math.max(0, coProfit - ct);
-  var empNI    = 0; // salary at primary threshold
-  var totalIncome = salary + divs;
-  var eff_pa   = pa(totalIncome);
-  var paLeft   = Math.max(0, eff_pa - salary);
-  var taxableDivs = Math.max(0, divs - paLeft - C.divAllowance);
-  var basicBand   = C.basicBandTop - C.personalAllowance;
-  var d1 = Math.min(taxableDivs, basicBand);
-  var d2 = Math.max(0, Math.min(taxableDivs - d1, C.addlBandTop - C.basicBandTop));
-  var d3 = Math.max(0, taxableDivs - d1 - d2);
-  var divTax = d1 * C.divBasic + d2 * C.divHigher + d3 * C.divAddl;
-  var total  = erNI + ct + empNI + divTax;
-  return { salary:salary, erNI:erNI, ct:ct, divs:divs, divTax:divTax, empNI:empNI, total:total, takehome:salary+divs-empNI-divTax };
-}
-
-// ─── MAIN CALCULATE ─────────────────────────────────────────────────────────
-function calculate() {
-  var rawVal  = document.getElementById('profit').value.replace(/[£,\s]/g, '');
-  var pension = parseFloat(document.getElementById('pension').value.replace(/[£,\s]/g, '')) || 0;
-  var gross   = parseFloat(rawVal);
-
-  if (!gross || gross <= 0 || isNaN(gross)) {
-    document.getElementById('error').style.display = 'block';
-    return;
-  }
-  document.getElementById('error').style.display = 'none';
-
-  var s1 = scenario1(gross, pension);
-  var s2 = scenario2(gross, pension);
-  var s3 = scenario3(gross, pension);
-  var base = gross - pension;
-  var r1 = base > 0 ? s1.total / base : 0;
-  var r2 = base > 0 ? s2.total / base : 0;
-  var r3 = base > 0 ? s3.total / base : 0;
-
-  // Summary cards
-  set('c1-th',   fmt(s1.takehome)); set('c1-tax', fmt(s1.total)); set('c1-rate', pct(r1));
-  set('c2-th',   fmt(s2.takehome)); set('c2-tax', fmt(s2.total)); set('c2-rate', pct(r2));
-  set('c3-th',   fmt(s3.takehome)); set('c3-tax', fmt(s3.total)); set('c3-rate', pct(r3));
-
-  var addl = s2.total - s1.total;
-  var el = document.getElementById('addl-tax');
-  el.textContent = fmt(addl) + ' additional tax';
-  el.className = 'big ' + (addl > 0 ? 'neg' : 'pos');
-
-  // ─── BREAKDOWN CARDS ────────────────────────────────────────────────────
-  function badge(delta, invertDelta) {
-    if (Math.abs(delta) < 1) return '';
-    var isGood = invertDelta ? delta > 0 : delta < 0;
-    var sign   = delta > 0 ? '+' : '−';
-    var val    = '£' + Math.round(Math.abs(delta)).toLocaleString('en-GB');
-    return '<span class="badge '+(isGood?'pos':'neg')+'">'+sign+val+'</span>';
+  // Twinkle dots scattered over the panel
+  for (var t = 0; t < 26; t++) {
+    var dot = document.createElement('span');
+    dot.className = 'pb-dot';
+    dot.style.left = (Math.random() * 100) + '%';
+    dot.style.top = (Math.random() * 100) + '%';
+    dot.style.animationDelay = (Math.random() * 4) + 's';
+    dot.style.animationDuration = (3 + Math.random() * 4) + 's';
+    orbs.appendChild(dot);
   }
 
-  function brow(label, v1, v2, v3, delta, invertDelta, isTot) {
-    var cls = isTot ? 'brow btot' : 'brow';
-    var badgeHtml = (delta !== null && delta !== undefined) ? badge(delta, invertDelta) : '';
-    return '<div class="'+cls+'">'
-      +'<span class="bl">'+label+badgeHtml+'</span>'
-      +'<div class="bvals">'
-      +'<span class="bval">'+v1+'</span>'
-      +'<span class="bval">'+v2+'</span>'
-      +(v3 !== null ? '<span class="bval'+(v3==='—'?' muted':'')+'">'+v3+'</span>' : '')
-      +'</div></div>';
-  }
-
-  function colHeads(threeCol) {
-    return '<div class="col-heads">'
-      +'<span class="col-head h1">Current</span>'
-      +'<span class="col-head h2">After NICs</span>'
-      +(threeCol ? '<span class="col-head h3">Incorporated</span>' : '')
-      +'</div>';
-  }
-
-  function bcard(title, inner, full) {
-    return '<div class="bcard'+(full?' full':'')+'"><h3>'+title+'</h3>'+inner+'</div>';
-  }
-
-  var html = '';
-
-  html += colHeads(true) + bcard('Profit & NIC', [
-    brow('Gross profit share',   fmt(gross),      fmt(gross),      fmt(gross),    null,                   false, false),
-    brow('Pension',              fmt(pension)||'£0', fmt(pension)||'£0', fmt(pension)||'£0', null,         false, false),
-    brow('Employer NICs',        '£0',            fmt(s2.erNI),    fmt(s3.erNI),  s2.erNI,                false, false),
-    brow('Distributable profit', fmt(s1.profit),  fmt(s2.profit),  '—',           s2.profit-s1.profit,    false, true),
-  ].join(''), false);
-
-  html += colHeads(true) + bcard('Income tax', [
-    brow('Personal allowance',  fmt(s1.allowance), fmt(s2.allowance), fmt(C.personalAllowance), null,           false, false),
-    brow('Taxable income',      fmt(s1.taxable),   fmt(s2.taxable),   '—',                      s2.taxable-s1.taxable, false, false),
-    brow('Income tax',          fmt(s1.itax),      fmt(s2.itax),      fmt(0),                   s2.itax-s1.itax, false, true),
-  ].join(''), false);
-
-  html += colHeads(true) + bcard('National Insurance', [
-    brow('Class 4 / Employee NI', fmt(s1.ni), fmt(s2.ni), fmt(s3.empNI), s2.ni-s1.ni, false, true),
-  ].join(''), false);
-
-  html += '<div class="bcard"><h3>Incorporated only</h3>'
-    +'<div class="brow"><span class="bl">Corporation tax</span><span class="bval">'+fmt(s3.ct)+'</span></div>'
-    +'<div class="brow"><span class="bl">Net dividends</span><span class="bval">'+fmt(s3.divs)+'</span></div>'
-    +'<div class="brow btot"><span class="bl">Dividend tax</span><span class="bval">'+fmt(s3.divTax)+'</span></div>'
-    +'</div>';
-
-  html += colHeads(true) + bcard('Summary', [
-    brow('Total tax & NIC', fmt(s1.total),    fmt(s2.total),    fmt(s3.total),    s2.total-s1.total,       false, false),
-    brow('Take-home pay',   fmt(s1.takehome), fmt(s2.takehome), fmt(s3.takehome), s2.takehome-s1.takehome, true,  false),
-    brow('Effective rate',  pct(r1),          pct(r2),          pct(r3),          null,                    false, true),
-  ].join(''), true);
-
-  document.getElementById('breakdown').innerHTML = html;
-  document.getElementById('results').className = 'results show';
-}
-
-function set(id, val) { document.getElementById(id).textContent = val; }
-
-// ─── CONFIG PANEL ────────────────────────────────────────────────────────────
-function toggleCfg() { document.getElementById('cfg-panel').classList.toggle('open'); }
-
-var CFG_LABELS = {
-  personalAllowance:'Personal Allowance (£)',  taperStart:'Taper Start (£)',
-  basicBandTop:'Basic Band Top (£)',           addlBandTop:'Additional Rate Threshold (£)',
-  rBasic:'Basic Rate',                         rHigher:'Higher Rate',           rAdditional:'Additional Rate',
-  c4Lower:'Class 4 Lower Limit (£)',           c4Upper:'Class 4 Upper Limit (£)',
-  c4Primary:'Class 4 Primary Rate',            c4Upper2:'Class 4 Upper Rate',
-  erThreshold:'ER NIC Threshold (£)',          erRate:'ER NIC Rate',
-  ctMain:'Corp Tax Main Rate',                 ctSmall:'Corp Tax Small Rate',   ctSmallLimit:'Small Profits Limit (£)',
-  divAllowance:'Dividend Allowance (£)',       divBasic:'Dividend Basic Rate',
-  divHigher:'Dividend Higher Rate',            divAddl:'Dividend Additional Rate',
-};
-
-function buildCfg() {
-  var g = document.getElementById('cfg-grid');
-  g.innerHTML = '';
-  Object.keys(CFG_LABELS).forEach(function(k) {
-    var d = document.createElement('div');
-    d.className = 'cfg-item';
-    d.innerHTML = '<label>'+CFG_LABELS[k]+'</label><input data-key="'+k+'" value="'+C[k]+'">';
-    g.appendChild(d);
+  var data = stages.map(function (s, i) {
+    return { id: s.id, label: s.getAttribute('data-label'), num: i + 1, el: s };
   });
-}
 
-function applyCfg() {
-  document.querySelectorAll('.cfg-item input[data-key]').forEach(function(inp) {
-    C[inp.dataset.key] = parseFloat(inp.value) || 0;
+  // ---- Linear rail ----
+  data.forEach(function (d, i) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pb-node';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-controls', d.id);
+    btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+    btn.innerHTML = '<span class="pb-node__dot">' + d.num + '</span>' +
+                    '<span class="pb-node__label">' + d.label + '</span>';
+    btn.addEventListener('click', function () { select(i); });
+    nodesWrap.appendChild(btn);
   });
-  toggleCfg();
-  if (document.getElementById('results').classList.contains('show')) calculate();
-}
+  var railNodes = nodesWrap.querySelectorAll('.pb-node');
 
-function resetCfg() {
-  C = JSON.parse(JSON.stringify(DEFAULTS));
-  buildCfg();
-}
+  // ---- Loop SVG ----
+  var W = 460, cx = W / 2, cy = W / 2, r = 150, pad = 54;
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', (-pad) + ' ' + (-pad) + ' ' + (W + pad * 2) + ' ' + (W + pad * 2));
+  svg.setAttribute('role', 'tablist');
 
-window.addEventListener('DOMContentLoaded', buildCfg);
+  function make(tag, attrs) {
+    var el = document.createElementNS(ns, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function pt(i, radius) {
+    var ang = (-90 + i * (360 / data.length)) * Math.PI / 180;
+    return { x: cx + radius * Math.cos(ang), y: cy + radius * Math.sin(ang) };
+  }
+
+  // Orbit (dashed ring + spark), hidden until settle
+  var orbit = make('g', { 'class': 'pb-loop__orbit' });
+  orbit.style.transformOrigin = cx + 'px ' + cy + 'px';
+  orbit.style.opacity = '0';
+  orbit.appendChild(make('circle', { cx: cx, cy: cy, r: r, fill: 'none',
+    stroke: 'rgba(0,224,208,.5)', 'stroke-width': 2, 'stroke-dasharray': '4 9' }));
+  var spark = make('circle', { 'class': 'pb-loop__spark', cx: cx, cy: cy - r, r: 4.5 });
+  orbit.appendChild(spark);
+  svg.appendChild(orbit);
+
+  // Draw-in arc (solid glowing circle that traces itself during the intro)
+  var drawArc = make('circle', { cx: cx, cy: cy, r: r, fill: 'none',
+    stroke: 'rgba(0,224,208,.95)', 'stroke-width': 3, 'stroke-linecap': 'round',
+    pathLength: 100, 'stroke-dasharray': 100, 'stroke-dashoffset': 100,
+    transform: 'rotate(-90 ' + cx + ' ' + cy + ')' });
+  drawArc.style.filter = 'drop-shadow(0 0 8px rgba(0,224,208,.9))';
+  svg.appendChild(drawArc);
+
+  // Shockwave ring for the settle moment
+  var shock = make('circle', { cx: cx, cy: cy, r: 20, fill: 'none',
+    stroke: 'rgba(0,224,208,.8)', 'stroke-width': 3 });
+  shock.style.opacity = '0';
+  svg.appendChild(shock);
+
+  // Wheel: node circles + numbers (spins in as one unit)
+  var wheel = make('g', { 'class': 'pb-loop__wheel' });
+  wheel.style.transformOrigin = cx + 'px ' + cy + 'px';
+  svg.appendChild(wheel);
+
+  // Labels live outside the wheel so they never spin
+  var labelsG = make('g', {});
+  labelsG.style.opacity = reduce ? '1' : '0';
+  svg.appendChild(labelsG);
+
+  var loopNodes = [];
+  data.forEach(function (d, i) {
+    var p = pt(i, r);
+    var g = make('g', { 'class': 'pb-loop__node', role: 'tab',
+      'aria-selected': i === 0 ? 'true' : 'false' });
+    g.appendChild(make('circle', { 'class': 'pb-loop__circle', cx: p.x, cy: p.y, r: 26 }));
+    var num = make('text', { 'class': 'pb-loop__num', x: p.x, y: p.y });
+    num.textContent = d.num;
+    g.appendChild(num);
+    g.addEventListener('click', function () { select(i); });
+    wheel.appendChild(g);
+    loopNodes.push(g);
+
+    var lp = pt(i, r + 46);
+    var lbl = make('text', { 'class': 'pb-loop__lbl', x: lp.x, y: lp.y + 4 });
+    var words = d.label.replace('&', 'and').split(' ');
+    if (words.length > 2) {
+      var half = Math.ceil(words.length / 2);
+      var t1 = make('tspan', { x: lp.x, dy: '-6' });
+      t1.textContent = words.slice(0, half).join(' ');
+      var t2 = make('tspan', { x: lp.x, dy: '13' });
+      t2.textContent = words.slice(half).join(' ');
+      lbl.appendChild(t1); lbl.appendChild(t2);
+    } else {
+      lbl.textContent = d.label.replace('&', 'and');
+    }
+    labelsG.appendChild(lbl);
+  });
+
+  // Centre text
+  var centreG = make('g', {});
+  centreG.style.transformOrigin = cx + 'px ' + cy + 'px';
+  centreG.style.opacity = reduce ? '1' : '0';
+  var c1 = make('text', { 'class': 'pb-loop__centre', x: cx, y: cy - 6 });
+  c1.textContent = 'The founder';
+  var c2 = make('text', { 'class': 'pb-loop__centre', x: cx, y: cy + 13 });
+  c2.textContent = 'lifecycle';
+  var c3 = make('text', { 'class': 'pb-loop__centre pb-loop__centre--sub', x: cx, y: cy + 32 });
+  c3.textContent = 'repeats with each venture';
+  centreG.appendChild(c1); centreG.appendChild(c2); centreG.appendChild(c3);
+  svg.appendChild(centreG);
+
+  loopWrap.appendChild(svg);
+
+  // ---- Cinematic intro ----
+  function runIntro() {
+    if (reduce || !wheel.animate) {
+      orbit.style.opacity = '1';
+      orbit.classList.add('is-ambient');
+      drawArc.remove();
+      postHeight();
+      return;
+    }
+    wheel.style.pointerEvents = 'none';
+
+    // Particle burst from the centre
+    for (var i = 0; i < 16; i++) {
+      var pcl = make('circle', { cx: cx, cy: cy, r: 2 + Math.random() * 2.5,
+        fill: Math.random() > .5 ? 'rgba(0,224,208,.9)' : 'rgba(255,255,255,.8)' });
+      svg.appendChild(pcl);
+      var ang = Math.random() * Math.PI * 2;
+      var dist = 70 + Math.random() * 160;
+      pcl.animate([
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: 'translate(' + Math.cos(ang) * dist + 'px,' + Math.sin(ang) * dist + 'px)', opacity: 0 }
+      ], { duration: 800 + Math.random() * 500, delay: 100, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' })
+        .onfinish = function () { this.effect.target.remove(); };
+    }
+
+    // Wheel spins in: 1.5 rotations, overshoot, settle
+    wheel.animate([
+      { transform: 'rotate(-540deg) scale(.15)', opacity: 0 },
+      { transform: 'rotate(10deg) scale(1.04)', opacity: 1, offset: .82 },
+      { transform: 'rotate(0deg) scale(1)', opacity: 1 }
+    ], { duration: 2100, delay: 120, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards' });
+
+    // Arc traces the circle during the spin, then dissolves
+    drawArc.animate([
+      { strokeDashoffset: 100 },
+      { strokeDashoffset: 0 }
+    ], { duration: 1500, delay: 250, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    setTimeout(function () {
+      drawArc.animate([{ opacity: 1 }, { opacity: 0 }],
+        { duration: 450, fill: 'forwards' }).onfinish = function () { drawArc.remove(); };
+      orbit.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, fill: 'forwards' })
+        .onfinish = function () { orbit.style.opacity = '1'; };
+    }, 1800);
+
+    // Shockwave at settle
+    setTimeout(function () {
+      shock.style.opacity = '1';
+      shock.animate([
+        { r: 20, opacity: .9, strokeWidth: 3 },
+        { r: 215, opacity: 0, strokeWidth: 1 }
+      ], { duration: 750, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' })
+        .onfinish = function () { shock.remove(); };
+    }, 2000);
+
+    // Centre text pops
+    setTimeout(function () {
+      centreG.animate([
+        { opacity: 0, transform: 'scale(.55)' },
+        { opacity: 1, transform: 'scale(1)' }
+      ], { duration: 480, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' })
+        .onfinish = function () { centreG.style.opacity = '1'; };
+    }, 1950);
+
+    // Labels stagger in, spark starts orbiting, interactions unlock
+    setTimeout(function () {
+      labelsG.style.opacity = '1';
+      Array.prototype.forEach.call(labelsG.children, function (lbl, i) {
+        lbl.style.opacity = '0';
+        lbl.animate([{ opacity: 0 }, { opacity: 1 }],
+          { duration: 350, delay: i * 70, fill: 'forwards' })
+          .onfinish = function () { lbl.style.opacity = '1'; };
+      });
+      orbit.classList.add('is-ambient');
+      wheel.style.pointerEvents = 'auto';
+      postHeight();
+    }, 2150);
+  }
+
+  // ---- Selection ----
+  function select(i) {
+    data.forEach(function (d, idx) { d.el.classList.toggle('is-active', idx === i); });
+    railNodes.forEach(function (n, idx) { n.setAttribute('aria-selected', idx === i ? 'true' : 'false'); });
+    loopNodes.forEach(function (n, idx) { n.setAttribute('aria-selected', idx === i ? 'true' : 'false'); });
+    var pct = data.length > 1 ? (i / (data.length - 1)) : 0;
+    fill.style.width = 'calc((100% - 64px) * ' + pct + ')';
+    postHeight();
+  }
+  select(0);
+
+  toggleBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      root.setAttribute('data-view', b.getAttribute('data-view-btn'));
+      toggleBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      postHeight();
+    });
+  });
+
+  // ---- Height broadcasting for iframe auto-size ----
+  function currentHeight() { return Math.ceil(document.body.getBoundingClientRect().height) + 4; }
+  function postHeight() {
+    if (window.parent === window) return;
+    window.parent.postMessage({ pbLifecycleHeight: currentHeight() }, '*');
+  }
+  window.addEventListener('load', function () { postHeight(); runIntro(); });
+  window.addEventListener('resize', postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+  postHeight();
+})();
 </script>
-
-<!-- HEADER -->
-<div class="header">
-  <h1>LLP Employer NICs Impact Calculator</h1>
-  <p>See how the proposed Employer NICs changes affect your take-home as an LLP partner, and compare with incorporation.</p>
-</div>
-
-<!-- INPUT -->
-<div class="input-section">
-  <div class="field">
-    <label>Partnership profit share (£)</label>
-    <div class="pound-wrap">
-      <span class="sym">£</span>
-      <input type="text" id="profit" placeholder="118,000" inputmode="numeric">
-    </div>
-  </div>
-  <div class="field">
-    <label>Pension contribution (£)</label>
-    <input type="text" class="plain-input" id="pension" placeholder="0" inputmode="numeric">
-  </div>
-  <button class="calc-btn" onclick="calculate()">Calculate &#8594;</button>
-</div>
-<div id="error" style="display:none;padding:8px 32px;color:var(--red);font-size:13px;font-weight:600;">Please enter a valid profit figure to continue.</div>
-
-<!-- CONFIG -->
-<div class="cfg-toggle-wrap">
-  <button onclick="toggleCfg()">&#9881; Adjust tax rates &amp; thresholds</button>
-</div>
-<div class="cfg-panel" id="cfg-panel">
-  <h3>Tax rates &amp; thresholds — update here after each Budget</h3>
-  <div class="cfg-grid" id="cfg-grid"></div>
-  <div class="cfg-actions">
-    <button class="btn-apply" onclick="applyCfg()">Apply</button>
-    <button class="btn-reset" onclick="resetCfg()">Reset to defaults</button>
-  </div>
-</div>
-
-<!-- RESULTS -->
-<div class="results" id="results">
-  <div class="cards">
-    <div class="card c1">
-      <div class="clabel">Current LLP</div>
-      <div class="big" id="c1-th">—</div>
-      <div class="small">take-home pay</div>
-      <div class="small" style="margin-top:6px">Total tax: <strong id="c1-tax">—</strong></div>
-      <div class="small">Effective rate: <strong id="c1-rate">—</strong></div>
-    </div>
-    <div class="card c2">
-      <div class="clabel">After NIC change</div>
-      <div class="big" id="c2-th">—</div>
-      <div class="small">take-home pay</div>
-      <div class="small" style="margin-top:6px">Total tax: <strong id="c2-tax">—</strong></div>
-      <div class="small">Effective rate: <strong id="c2-rate">—</strong></div>
-    </div>
-    <div class="card c3">
-      <div class="clabel">If Incorporated</div>
-      <div class="big" id="c3-th">—</div>
-      <div class="small">take-home pay</div>
-      <div class="small" style="margin-top:6px">Total tax: <strong id="c3-tax">—</strong></div>
-      <div class="small">Effective rate: <strong id="c3-rate">—</strong></div>
-    </div>
-    <div class="card cd">
-      <div class="clabel">NIC change impact</div>
-      <div class="big neg" id="addl-tax">—</div>
-      <div class="small">vs current LLP</div>
-    </div>
-  </div>
-
-  <div class="detail">
-    <h2>Full breakdown</h2>
-    <div class="breakdown-grid" id="breakdown"></div>
-  </div>
-</div>
-
-<!-- DISCLAIMER -->
-<div class="disclaimer">
-  <strong>Important:</strong> For illustrative purposes only. The Government has not yet finalised how Employer NICs will apply to LLP partners. This calculator uses the "off the top" methodology. Not tax advice — always consult a qualified adviser. Price Bailey LLP accepts no liability for decisions made based on this tool.
-</div>
-
 </body>
 </html>
