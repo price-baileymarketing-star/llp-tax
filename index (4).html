@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technology business lifecycle | Price Bailey</title>
+<meta name="robots" content="noindex">
+<!--
+  Standalone, iframe-ready. Horizontal flowing arc, dark high-tech panel.
+  Layered motion: animated gradient draw-on, energy pulse along the path,
+  data-flow particles, circuit dot-grid, drifting glow fields, node power-on,
+  rotating halo on the active node, animated return loop. Compact vertically
+  so it fits a wide, short content column. Respects prefers-reduced-motion.
+  Broadcasts height via postMessage for iframe auto-sizing.
+-->
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  body { padding: 12px; }
+
+  .pb-journey {
+    --pb-navy: #0a1b34;
+    --pb-teal: #00c2b6;
+    --pb-teal-bright: #24e6d8;
+    --pb-ink: #2a3340;
+    --pb-muted: #5b6675;
+    --pb-line: #e1e6ee;
+    --pb-bg: #f6f8fb;
+    --pb-card: #ffffff;
+    --pb-light: rgba(255,255,255,.9);
+    --pb-dim: rgba(255,255,255,.6);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--pb-light);
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    container-type: inline-size;
+    container-name: pbj;
+    position: relative;
+    background:
+      radial-gradient(70% 120% at 82% -10%, rgba(0,194,182,.22), transparent 55%),
+      radial-gradient(60% 120% at 12% 110%, rgba(46,124,224,.20), transparent 55%),
+      linear-gradient(165deg, #123156 0%, #0a1b34 60%, #081428 100%);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 18px;
+    padding: clamp(20px, 3.5cqi, 30px) clamp(16px, 3cqi, 28px);
+    box-shadow: 0 22px 55px -26px rgba(4,12,28,.85);
+    overflow: hidden;
+  }
+  .pb-journey *, .pb-journey *::before, .pb-journey *::after { box-sizing: border-box; }
+  .pb-journey ul { list-style: none; margin: 0; padding: 0; }
+  .pb-journey li { list-style: none; margin: 0; }
+  .pb-journey a { text-decoration: none; }
+
+  /* circuit dot-grid + drifting glow fields */
+  .pb-fx { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .pb-fx__grid { position: absolute; inset: -2px;
+    background-image: radial-gradient(rgba(255,255,255,.18) 1px, transparent 1.4px);
+    background-size: 22px 22px; opacity: .12; mask-image: radial-gradient(120% 80% at 50% 20%, #000 40%, transparent 80%);
+    animation: pbGridPan 24s linear infinite; }
+  .pb-fx__glow { position: absolute; border-radius: 50%; filter: blur(60px); }
+  .pb-fx__glow--a { width: 40cqi; height: 40cqi; background: rgba(0,194,182,.28); top: -14cqi; right: -6cqi;
+    animation: pbGlowA 15s ease-in-out infinite alternate; }
+  .pb-fx__glow--b { width: 36cqi; height: 36cqi; background: rgba(52,120,235,.24); bottom: -14cqi; left: -8cqi;
+    animation: pbGlowB 19s ease-in-out infinite alternate; }
+  @keyframes pbGridPan { to { background-position: 22px 22px; } }
+  @keyframes pbGlowA { to { transform: translate(-6cqi, 5cqi) scale(1.14); } }
+  @keyframes pbGlowB { to { transform: translate(6cqi, -5cqi) scale(1.12); } }
+  .pb-journey > *:not(.pb-fx) { position: relative; z-index: 1; }
+
+  .pb-journey__head { text-align: center; margin-bottom: 4px; }
+  .pb-journey__eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: 11.5px;
+    font-weight: 700; color: var(--pb-teal-bright); margin: 0 0 5px; text-shadow: 0 0 16px rgba(36,230,216,.45); }
+  .pb-journey__title { font-size: clamp(19px, 3.3cqi, 25px); line-height: 1.18; color: #fff;
+    margin: 0 0 6px; font-weight: 700; }
+  .pb-journey__lede { max-width: 560px; margin: 0 auto 6px; color: var(--pb-dim); font-size: 14.5px; line-height: 1.5; }
+
+  /* ---------- Horizontal arc rail ---------- */
+  .pb-arc { position: relative; width: 100%; margin: 8px 0 2px; }
+  .pb-arc svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .pb-arc__path { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 3; }
+  .pb-arc__prog { fill: none; stroke: url(#pbGrad); stroke-width: 3.5; stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgba(0,194,182,.6)); }
+  .pb-arc__pulse { fill: none; stroke: var(--pb-teal-bright); stroke-width: 4; stroke-linecap: round;
+    filter: drop-shadow(0 0 8px rgba(36,230,216,.95)); opacity: 0; }
+  .pb-arc__return { fill: none; stroke: var(--pb-teal); stroke-width: 2; opacity: .8; }
+  .pb-particle { fill: var(--pb-teal-bright); filter: drop-shadow(0 0 4px rgba(36,230,216,.9)); }
+
+  .pb-node { cursor: pointer; }
+  .pb-node__halo { fill: none; stroke: var(--pb-teal-bright); stroke-width: 1.5; stroke-dasharray: 3 5; opacity: 0;
+    transform-box: fill-box; transform-origin: center; }
+  .pb-node[aria-selected="true"] .pb-node__halo { opacity: .9; animation: pbSpinHalo 6s linear infinite; }
+  .pb-node__ring { fill: rgba(255,255,255,.06); stroke: rgba(255,255,255,.3); stroke-width: 3; transition: .2s; }
+  .pb-node:hover .pb-node__ring { stroke: var(--pb-teal-bright); fill: rgba(0,194,182,.12); }
+  .pb-node[aria-selected="true"] .pb-node__ring { fill: var(--pb-teal); stroke: var(--pb-teal-bright);
+    animation: pbPulse 2.2s ease-in-out infinite; }
+  .pb-node__num { fill: var(--pb-light); font-weight: 700; font-size: 15px; text-anchor: middle;
+    dominant-baseline: central; pointer-events: none; transition: .2s; }
+  .pb-node[aria-selected="true"] .pb-node__num { fill: var(--pb-navy); }
+  .pb-node__lbl { fill: var(--pb-light); font-size: 11.5px; font-weight: 600; text-anchor: middle; pointer-events: none; }
+  .pb-node[aria-selected="true"] .pb-node__lbl { fill: #fff; }
+
+  /* ---------- Stage detail (white cards pop on dark) ---------- */
+  .pb-stages { margin-top: 14px; }
+  .pb-stage { background: var(--pb-card); border: 1px solid rgba(255,255,255,.12); border-radius: 14px;
+    padding: 20px 20px 6px; box-shadow: 0 12px 30px -16px rgba(0,0,0,.6); }
+  .pb-stage { display: none; }
+  .pb-stage.is-active { display: block; animation: pbStageIn .38s ease both; }
+  .pb-stage__head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pb-stage__num { font-size: 12.5px; font-weight: 700; color: #fff; background: var(--pb-teal);
+    border-radius: 999px; padding: 3px 10px; letter-spacing: .04em; }
+  .pb-stage__title { font-size: 18px; color: var(--pb-navy); margin: 0; font-weight: 700; }
+  .pb-stage__desc { color: var(--pb-muted); font-size: 14.5px; line-height: 1.55; margin: 10px 0 14px; }
+  .pb-stage__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 9px; padding: 0 0 14px; margin: 0; }
+  .pb-stage__grid a { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    color: var(--pb-navy); font-weight: 600; font-size: 14px; border: 1px solid var(--pb-line);
+    border-radius: 10px; padding: 11px 13px; background: var(--pb-bg); transition: .16s; }
+  .pb-stage__grid a:hover { border-color: var(--pb-teal-bright); background: #fff; transform: translateY(-1px);
+    box-shadow: 0 6px 14px -8px rgba(0,163,154,.5); }
+  .pb-stage__grid a::after { content: "\2192"; color: var(--pb-teal); font-weight: 700; }
+  .pb-stage__loop { font-size: 13px; color: #00857c; font-weight: 600; border-top: 1px dashed var(--pb-line);
+    padding: 11px 0 14px; margin: 0; }
+
+  @keyframes pbPulse { 0%,100% { filter: drop-shadow(0 0 0 rgba(36,230,216,0)); } 50% { filter: drop-shadow(0 0 9px rgba(36,230,216,.9)); } }
+  @keyframes pbSpinHalo { to { transform: rotate(360deg); } }
+  @keyframes pbStageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-journey *, .pb-journey *::before { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<section class="pb-journey" aria-label="Technology business lifecycle">
+  <div class="pb-fx" aria-hidden="true">
+    <div class="pb-fx__grid"></div>
+    <div class="pb-fx__glow pb-fx__glow--a"></div>
+    <div class="pb-fx__glow pb-fx__glow--b"></div>
+  </div>
+
+  <div class="pb-journey__head">
+    <p class="pb-journey__eyebrow">Technology business lifecycle</p>
+    <h2 class="pb-journey__title">Wherever you are in the tech growth journey</h2>
+    <p class="pb-journey__lede">Founders rarely stop at one business. Tap a stage to see how we help, then follow the loop back round to the next venture.</p>
+  </div>
+
+  <div class="pb-arc" data-arc></div>
+
+  <div class="pb-stages" data-stages>
+    <article class="pb-stage is-active" id="pb-stage-1" data-label="Start &amp; build">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 1</span><h3 class="pb-stage__title">Start &amp; build</h3></div>
+      <p class="pb-stage__desc">Incorporate, fund early research and development, and put the financial foundations in place so you can make commercial decisions from day one.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/tax/rd-tax-relief/" target="_blank" rel="noopener">R&amp;D tax relief</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/cloud-accounting/" target="_blank" rel="noopener">Cloud accounting</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/share-schemes-employees/" target="_blank" rel="noopener">Share schemes for employees</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/business-forecasting/" target="_blank" rel="noopener">Business forecasting and modelling</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/group-structuring/" target="_blank" rel="noopener">Group structuring</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-2" data-label="Fund &amp; grow">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 2</span><h3 class="pb-stage__title">Fund &amp; grow</h3></div>
+      <p class="pb-stage__desc">Raise angel investment, venture capital, private equity or debt to accelerate the financial information and due diligence readiness investors expect.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/series-ab-funding/" target="_blank" rel="noopener">Series A &amp; B funding</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/private-equity-funding/" target="_blank" rel="noopener">Private equity funding</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/debt-advisory-services/" target="_blank" rel="noopener">Debt advisory services</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/financial-due-diligence/" target="_blank" rel="noopener">Financial due diligence</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/vat/" target="_blank" rel="noopener">International VAT services</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-3" data-label="Scale up">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 3</span><h3 class="pb-stage__title">Scale up</h3></div>
+      <p class="pb-stage__desc">Expand internationally and build the finance function to handle the complexity of multiple revenue models, territories and teams.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/outsourced-finance-team/" target="_blank" rel="noopener">Outsourced finance team</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/international-market-development/" target="_blank" rel="noopener">International market development</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/transfer-pricing/" target="_blank" rel="noopener">Transfer pricing</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/management-accounts/" target="_blank" rel="noopener">Management accounts</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/valuations/growth-shares/" target="_blank" rel="noopener">Growth shares valuations</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-4" data-label="Optimise &amp; govern">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 4</span><h3 class="pb-stage__title">Optimise &amp; govern</h3></div>
+      <p class="pb-stage__desc">Strengthen systems, controls and governance so the board has accurate, commercial and meaningful data to guide pricing, margin and the next move.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/accounting/systems-consultancy-processes-review/" target="_blank" rel="noopener">Systems consultancy and processes</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/audit-assurance/" target="_blank" rel="noopener">Audit &amp; assurance</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/tax/governance/" target="_blank" rel="noopener">Tax governance</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/strategic-planning/" target="_blank" rel="noopener">Strategic planning</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-5" data-label="Exit &amp; realise value">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 5</span><h3 class="pb-stage__title">Exit &amp; realise value</h3></div>
+      <p class="pb-stage__desc">Prepare for and execute a sale, management buyout or employee ownership trust, and demonstrate to buyers a long history of strong financial information.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/selling-your-business/" target="_blank" rel="noopener">Selling your business</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/mergers-acquisitions/" target="_blank" rel="noopener">Mergers and acquisitions</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/vendor-due-diligence/" target="_blank" rel="noopener">Vendor due diligence</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/employee-ownership-trusts/" target="_blank" rel="noopener">Employee ownership trusts</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/corporate-finance/mbo-buyouts/" target="_blank" rel="noopener">Management buyouts</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/valuations/" target="_blank" rel="noopener">Valuations</a></li>
+      </ul>
+    </article>
+
+    <article class="pb-stage" id="pb-stage-6" data-label="Next venture &amp; family office">
+      <div class="pb-stage__head"><span class="pb-stage__num">Stage 6</span><h3 class="pb-stage__title">Next venture &amp; family office</h3></div>
+      <p class="pb-stage__desc">Plan and protect personal wealth after a successful exit, then put it to work backing the next idea.</p>
+      <ul class="pb-stage__grid">
+        <li><a href="https://www.pricebailey.co.uk/services/tax/family-investment-company/" target="_blank" rel="noopener">Family investment company</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/for-individuals/inheritance-tax-planning/" target="_blank" rel="noopener">Inheritance tax planning</a></li>
+        <li><a href="https://www.pricebailey.co.uk/services/for-individuals/personal-tax/" target="_blank" rel="noopener">Personal tax planning</a></li>
+        <li><a href="https://www.pricebailey.co.uk/blog/eis-seis-investors/" target="_blank" rel="noopener">Becoming an angel investor</a></li>
+      </ul>
+      <p class="pb-stage__loop">The cycle repeats: many founders move straight into a new venture, and we are with them from stage one again.</p>
+    </article>
+  </div>
+</section>
+
+<script>
+(function () {
+  var root = document.querySelector('.pb-journey');
+  if (!root) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var stages = Array.prototype.slice.call(root.querySelectorAll('.pb-stage'));
+  var arcWrap = root.querySelector('[data-arc]');
+  var data = stages.map(function (s, i) {
+    return { id: s.id, label: s.getAttribute('data-label'), num: i + 1, el: s };
+  });
+
+  var ns = 'http://www.w3.org/2000/svg';
+  function make(tag, attrs) {
+    var el = document.createElementNS(ns, tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  var VW = 900, VH = 158, n = data.length;
+  var mL = 70, mR = 70, span = VW - mL - mR, midY = 76, amp = 20;
+  function nodeX(i) { return mL + span * (i / (n - 1)); }
+  function nodeY(i) { return midY + (i % 2 === 0 ? -amp : amp); }
+
+  function buildPath(pts) {
+    var d = 'M ' + pts[0].x + ' ' + pts[0].y;
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[i === 0 ? 0 : i - 1], p1 = pts[i], p2 = pts[i + 1],
+          p3 = pts[i + 2 > pts.length - 1 ? pts.length - 1 : i + 2];
+      var c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+      var c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+      d += ' C ' + c1x + ' ' + c1y + ' ' + c2x + ' ' + c2y + ' ' + p2.x + ' ' + p2.y;
+    }
+    return d;
+  }
+
+  var pts = data.map(function (d, i) { return { x: nodeX(i), y: nodeY(i) }; });
+  var pathD = buildPath(pts);
+
+  var svg = make('svg', { viewBox: '0 0 ' + VW + ' ' + VH, role: 'tablist', 'aria-label': 'Lifecycle stages' });
+  svg.innerHTML =
+    '<defs>' +
+      '<linearGradient id="pbGrad" x1="0" y1="0" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="#24e6d8"/><stop offset=".55" stop-color="#00a39a"/><stop offset="1" stop-color="#3a78e0"/>' +
+      '</linearGradient>' +
+      '<marker id="pbArrow" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">' +
+        '<path d="M0,0 L6,3 L0,6 Z" fill="#00c2b6"/></marker>' +
+    '</defs>';
+
+  // base track
+  svg.appendChild(make('path', { 'class': 'pb-arc__path', d: pathD }));
+
+  // return sweep (the loop)
+  var last = pts[n - 1], first = pts[0], dip = VH - 12;
+  var returnD = 'M ' + last.x + ' ' + last.y +
+    ' C ' + (last.x + 46) + ' ' + dip + ' ' + (first.x - 46) + ' ' + dip + ' ' + first.x + ' ' + first.y;
+  var returnPath = make('path', { 'class': 'pb-arc__return', d: returnD, 'marker-end': 'url(#pbArrow)' });
+  svg.appendChild(returnPath);
+
+  // gradient progress path (draws on)
+  var prog = make('path', { 'class': 'pb-arc__prog', d: pathD, pathLength: 100 });
+  svg.appendChild(prog);
+
+  // energy pulse (short bright segment travelling the path)
+  var pulse = make('path', { 'class': 'pb-arc__pulse', d: pathD, pathLength: 100, 'stroke-dasharray': '10 90', 'stroke-dashoffset': 100 });
+  svg.appendChild(pulse);
+
+  // measurable path for particles + pulse geometry
+  var measure = make('path', { d: pathD, fill: 'none', stroke: 'none' });
+  svg.appendChild(measure);
+  var totalLen = measure.getTotalLength ? measure.getTotalLength() : 700;
+
+  // nodes
+  var loopNodes = [];
+  data.forEach(function (d, i) {
+    var g = make('g', { 'class': 'pb-node', role: 'tab', 'aria-selected': i === 0 ? 'true' : 'false' });
+    g.appendChild(make('circle', { 'class': 'pb-node__halo', cx: pts[i].x, cy: pts[i].y, r: 27 }));
+    g.appendChild(make('circle', { 'class': 'pb-node__ring', cx: pts[i].x, cy: pts[i].y, r: 20 }));
+    var num = make('text', { 'class': 'pb-node__num', x: pts[i].x, y: pts[i].y });
+    num.textContent = d.num;
+    g.appendChild(num);
+    var lblY = pts[i].y + (nodeY(i) < midY ? -30 : 34);
+    var lbl = make('text', { 'class': 'pb-node__lbl', x: pts[i].x, y: lblY });
+    var words = d.label.split(' ');
+    if (words.length > 2) {
+      var half = Math.ceil(words.length / 2);
+      var t1 = make('tspan', { x: pts[i].x, dy: '-5' }); t1.textContent = words.slice(0, half).join(' ');
+      var t2 = make('tspan', { x: pts[i].x, dy: '13' }); t2.textContent = words.slice(half).join(' ');
+      lbl.appendChild(t1); lbl.appendChild(t2);
+    } else { lbl.textContent = d.label; }
+    g.appendChild(lbl);
+    g.addEventListener('click', function () { select(i); });
+    svg.appendChild(g);
+    loopNodes.push(g);
+  });
+
+  arcWrap.appendChild(svg);
+
+  // ---- Data-flow particles riding the path ----
+  var particles = [];
+  function spawnParticles() {
+    for (var i = 0; i < 4; i++) {
+      var p = make('circle', { 'class': 'pb-particle', r: 2.6, cx: pts[0].x, cy: pts[0].y });
+      svg.appendChild(p);
+      particles.push({ el: p, offset: i / 4, speed: 0.00013 + Math.random() * 0.00005 });
+    }
+    var start = null;
+    function step(ts) {
+      if (start === null) start = ts;
+      particles.forEach(function (pt) {
+        pt.offset = (pt.offset + pt.speed * 16) % 1;
+        var pos = measure.getPointAtLength(pt.offset * totalLen);
+        pt.el.setAttribute('cx', pos.x);
+        pt.el.setAttribute('cy', pos.y);
+        pt.el.style.opacity = 0.35 + 0.65 * Math.sin(pt.offset * Math.PI);
+      });
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---- Intro ----
+  function runIntro() {
+    if (reduce || !prog.animate) {
+      prog.setAttribute('stroke-dasharray', '100'); prog.setAttribute('stroke-dashoffset', '0');
+      returnPath.style.strokeDasharray = '5 6';
+      loopNodes.forEach(function (g) { g.style.opacity = '1'; });
+      postHeight(); return;
+    }
+    prog.setAttribute('stroke-dasharray', '100');
+    prog.setAttribute('stroke-dashoffset', '100');
+    prog.animate([{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }],
+      { duration: 1200, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+
+    // nodes power on in sequence with a ring flare
+    loopNodes.forEach(function (g, i) {
+      g.style.opacity = '0';
+      g.style.transformBox = 'fill-box'; g.style.transformOrigin = 'center';
+      g.animate([{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1.12)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }],
+        { duration: 480, delay: 250 + i * 160, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'forwards' })
+        .onfinish = function () { g.style.opacity = '1'; g.style.transform = 'none'; };
+      var ring = g.querySelector('.pb-node__ring');
+      setTimeout(function () {
+        ring.animate([{ strokeWidth: 3, stroke: '#24e6d8' }, { strokeWidth: 9, stroke: 'rgba(36,230,216,0)' }],
+          { duration: 550, easing: 'ease-out' });
+      }, 250 + i * 160 + 220);
+    });
+
+    // return loop draws in
+    var len = returnPath.getTotalLength ? returnPath.getTotalLength() : 400;
+    returnPath.style.strokeDasharray = len; returnPath.style.strokeDashoffset = len;
+    setTimeout(function () {
+      returnPath.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }],
+        { duration: 800, easing: 'ease', fill: 'forwards' })
+        .onfinish = function () { returnPath.style.strokeDasharray = '6 6'; returnPath.style.strokeDashoffset = '0'; };
+    }, 1150);
+
+    // after draw: start the travelling energy pulse + particles
+    setTimeout(function () {
+      pulse.style.opacity = '1';
+      pulse.animate([{ strokeDashoffset: 100 }, { strokeDashoffset: 0 }],
+        { duration: 2600, easing: 'linear', iterations: Infinity });
+      spawnParticles();
+      postHeight();
+    }, 1400);
+  }
+
+  function select(i) {
+    data.forEach(function (d, idx) { d.el.classList.toggle('is-active', idx === i); });
+    loopNodes.forEach(function (g, idx) { g.setAttribute('aria-selected', idx === i ? 'true' : 'false'); });
+    postHeight();
+  }
+  select(0);
+
+  function currentHeight() { return Math.ceil(document.body.getBoundingClientRect().height) + 4; }
+  function postHeight() {
+    if (window.parent === window) return;
+    window.parent.postMessage({ pbLifecycleHeight: currentHeight() }, '*');
+  }
+  window.addEventListener('load', function () { postHeight(); runIntro(); });
+  window.addEventListener('resize', postHeight);
+  if (window.ResizeObserver) { new ResizeObserver(postHeight).observe(document.body); }
+  postHeight();
+})();
+</script>
+</body>
+</html>
